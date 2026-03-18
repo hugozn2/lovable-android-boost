@@ -22,7 +22,7 @@ const PRESET_GAMES: Game[] = [
   { id: "10", name: "Among Us", icon: "🚀", color: "hsl(350, 70%, 50%)" },
 ];
 
-const transition = { duration: 0.2, ease: [0.25, 0.1, 0.25, 1] };
+const transition = { duration: 0.2, ease: [0.25, 0.1, 0.25, 1] as const };
 
 const GameSpace = () => {
   const [games, setGames] = useState<Game[]>([]);
