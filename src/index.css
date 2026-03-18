@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,48 +6,56 @@
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    --background: 220 25% 6%;
+    --foreground: 210 40% 96%;
 
-    --card: 217 33% 17%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 20% 10%;
+    --card-foreground: 210 40% 96%;
 
-    --popover: 217 33% 17%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 20% 10%;
+    --popover-foreground: 210 40% 96%;
 
-    --primary: 187 92% 45%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 195 100% 50%;
+    --primary-foreground: 220 25% 6%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 20% 14%;
+    --secondary-foreground: 210 40% 96%;
 
-    --muted: 217 33% 22%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 220 18% 16%;
+    --muted-foreground: 215 15% 50%;
 
-    --accent: 263 70% 50%;
+    --accent: 263 70% 55%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 22%;
-    --input: 217 33% 22%;
-    --ring: 187 92% 45%;
+    --success: 160 70% 42%;
+    --success-foreground: 220 25% 6%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 220 25% 6%;
+
+    --border: 220 15% 16%;
+    --input: 220 15% 16%;
+    --ring: 195 100% 50%;
 
     --radius: 1rem;
 
-    --surface: 217 33% 17%;
-    --data: 187 92% 45%;
-    --game-accent: 263 70% 50%;
+    --surface: 220 20% 10%;
+    --surface-elevated: 220 18% 13%;
+    --data: 195 100% 50%;
+    --game-accent: 263 70% 55%;
+    --frost-glow: 195 100% 50%;
 
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 187 92% 45%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 217 33% 17%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 22%;
-    --sidebar-ring: 187 92% 45%;
+    --sidebar-background: 220 25% 6%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 195 100% 50%;
+    --sidebar-primary-foreground: 220 25% 6%;
+    --sidebar-accent: 220 20% 10%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 220 15% 16%;
+    --sidebar-ring: 195 100% 50%;
   }
 }
 
@@ -57,7 +65,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
@@ -69,12 +77,28 @@
 
 @layer components {
   .card-surface {
-    @apply bg-card rounded-[16px] p-4;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    @apply bg-card rounded-[16px] p-4 border border-border/50;
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.3), 
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.03);
+  }
+
+  .card-surface-elevated {
+    @apply rounded-[16px] p-4 border border-border/50;
+    background: hsl(var(--surface-elevated));
+    box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .card-frost {
+    @apply rounded-[20px] p-5 border border-primary/10;
+    background: linear-gradient(135deg, hsl(220 20% 10% / 0.9), hsl(220 20% 12% / 0.8));
+    box-shadow: 0 0 40px -10px hsl(var(--frost-glow) / 0.08),
+                0 8px 32px -4px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
   }
 
   .stat-label {
-    @apply text-xs text-muted-foreground uppercase tracking-widest;
+    @apply text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-semibold;
   }
 
   .stat-value {
@@ -82,35 +106,62 @@
   }
 
   .stat-unit {
-    @apply text-sm text-muted-foreground;
+    @apply text-sm text-muted-foreground font-mono;
   }
 
   .btn-primary-full {
-    @apply w-full py-4 bg-primary text-primary-foreground font-bold rounded-[12px] text-base;
-    min-height: 48px;
+    @apply w-full py-4 font-bold rounded-[14px] text-base transition-all duration-200;
+    background: linear-gradient(135deg, hsl(195 100% 50%), hsl(195 100% 40%));
+    color: hsl(var(--primary-foreground));
+    min-height: 52px;
+    box-shadow: 0 4px 20px -4px hsl(195 100% 50% / 0.35),
+                inset 0 1px 0 0 hsl(195 100% 70% / 0.2);
+  }
+
+  .btn-primary-full:hover {
+    box-shadow: 0 4px 28px -4px hsl(195 100% 50% / 0.5),
+                inset 0 1px 0 0 hsl(195 100% 70% / 0.3);
+  }
+
+  .btn-primary-full:disabled {
+    opacity: 0.7;
   }
 
   .btn-game-full {
-    @apply w-full py-4 font-bold rounded-[12px] text-base text-accent-foreground;
-    background-color: hsl(var(--game-accent));
-    min-height: 48px;
+    @apply w-full py-4 font-bold rounded-[14px] text-base transition-all duration-200;
+    background: linear-gradient(135deg, hsl(263 70% 55%), hsl(263 70% 45%));
+    color: hsl(var(--accent-foreground));
+    min-height: 52px;
+    box-shadow: 0 4px 20px -4px hsl(263 70% 55% / 0.35),
+                inset 0 1px 0 0 hsl(263 70% 70% / 0.2);
   }
 
   .progress-track {
-    @apply w-full bg-muted h-1 rounded-full overflow-hidden;
+    @apply w-full bg-muted h-1.5 rounded-full overflow-hidden;
   }
 
   .progress-fill {
-    @apply bg-primary h-full rounded-full transition-all duration-500;
+    @apply h-full rounded-full transition-all duration-700;
+    background: linear-gradient(90deg, hsl(195 100% 50%), hsl(195 100% 40%));
   }
 
   .progress-fill-accent {
     @apply h-full rounded-full transition-all duration-500;
-    background-color: hsl(var(--game-accent));
+    background: linear-gradient(90deg, hsl(263 70% 55%), hsl(263 70% 45%));
+  }
+
+  .progress-fill-danger {
+    @apply h-full rounded-full transition-all duration-700;
+    background: linear-gradient(90deg, hsl(0 72% 55%), hsl(0 72% 45%));
+  }
+
+  .progress-fill-success {
+    @apply h-full rounded-full transition-all duration-700;
+    background: linear-gradient(90deg, hsl(160 70% 42%), hsl(160 70% 35%));
   }
 
   .nav-tab {
-    @apply flex flex-col items-center gap-1 py-2 px-4 text-muted-foreground transition-colors duration-200;
+    @apply flex flex-col items-center gap-1 py-3 px-5 text-muted-foreground transition-all duration-200;
   }
 
   .nav-tab-active {
@@ -119,5 +170,27 @@
 
   .nav-tab-game-active {
     color: hsl(var(--game-accent));
+  }
+
+  .frost-glow {
+    box-shadow: 0 0 60px -15px hsl(195 100% 50% / 0.15);
+  }
+
+  .game-glow {
+    box-shadow: 0 0 60px -15px hsl(263 70% 55% / 0.15);
+  }
+
+  .text-gradient-frost {
+    background: linear-gradient(135deg, hsl(195 100% 55%), hsl(195 100% 70%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-game {
+    background: linear-gradient(135deg, hsl(263 70% 60%), hsl(263 70% 75%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
