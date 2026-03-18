@@ -17,13 +17,13 @@ const AppShell = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
       {/* Content */}
-      <main className="flex-1 px-4 pt-6 overflow-y-auto">
+      <main className="flex-1 px-4 pt-5 overflow-y-auto">
         {activeTab === "dashboard" && <Dashboard />}
         {activeTab === "games" && <GameSpace />}
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="sticky bottom-0 bg-card/80 backdrop-blur-xl border-t border-border px-6 pb-safe">
+      <nav className="sticky bottom-0 bg-card/90 backdrop-blur-xl border-t border-border/50">
         <div className="flex justify-around">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -42,13 +42,18 @@ const AppShell = () => {
                 }`}
               >
                 <Icon className="w-5 h-5" />
-                <span className="text-xs font-medium">{tab.label}</span>
+                <span className="text-[11px] font-semibold">{tab.label}</span>
                 {isActive && (
                   <motion.div
                     layoutId="tab-indicator"
-                    className={`absolute -top-px left-2 right-2 h-0.5 rounded-full ${
+                    className={`absolute -top-px left-3 right-3 h-[2px] rounded-full ${
                       isGame ? "bg-game-accent" : "bg-primary"
                     }`}
+                    style={{
+                      boxShadow: isGame
+                        ? "0 0 12px hsl(263, 70%, 55%)"
+                        : "0 0 12px hsl(195, 100%, 50%)",
+                    }}
                   />
                 )}
               </button>
