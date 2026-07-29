@@ -6,56 +6,56 @@
 
 @layer base {
   :root {
-    --background: 220 25% 6%;
+    --background: 265 30% 6%;
     --foreground: 210 40% 96%;
 
-    --card: 220 20% 10%;
+    --card: 265 24% 10%;
     --card-foreground: 210 40% 96%;
 
-    --popover: 220 20% 10%;
+    --popover: 265 24% 10%;
     --popover-foreground: 210 40% 96%;
 
-    --primary: 195 100% 50%;
-    --primary-foreground: 220 25% 6%;
+    --primary: 270 85% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 14%;
+    --secondary: 265 22% 14%;
     --secondary-foreground: 210 40% 96%;
 
-    --muted: 220 18% 16%;
+    --muted: 265 20% 16%;
     --muted-foreground: 215 15% 50%;
 
-    --accent: 263 70% 55%;
+    --accent: 300 80% 58%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 72% 55%;
     --destructive-foreground: 210 40% 98%;
 
     --success: 160 70% 42%;
-    --success-foreground: 220 25% 6%;
+    --success-foreground: 265 30% 6%;
 
     --warning: 38 92% 55%;
-    --warning-foreground: 220 25% 6%;
+    --warning-foreground: 265 30% 6%;
 
-    --border: 220 15% 16%;
-    --input: 220 15% 16%;
-    --ring: 195 100% 50%;
+    --border: 265 18% 18%;
+    --input: 265 18% 18%;
+    --ring: 270 85% 60%;
 
     --radius: 1rem;
 
-    --surface: 220 20% 10%;
-    --surface-elevated: 220 18% 13%;
-    --data: 195 100% 50%;
-    --game-accent: 263 70% 55%;
-    --frost-glow: 195 100% 50%;
+    --surface: 265 24% 10%;
+    --surface-elevated: 265 22% 13%;
+    --data: 270 85% 60%;
+    --game-accent: 300 80% 58%;
+    --frost-glow: 270 85% 60%;
 
-    --sidebar-background: 220 25% 6%;
+    --sidebar-background: 265 30% 6%;
     --sidebar-foreground: 210 40% 96%;
-    --sidebar-primary: 195 100% 50%;
-    --sidebar-primary-foreground: 220 25% 6%;
-    --sidebar-accent: 220 20% 10%;
+    --sidebar-primary: 270 85% 60%;
+    --sidebar-primary-foreground: 265 30% 6%;
+    --sidebar-accent: 265 24% 10%;
     --sidebar-accent-foreground: 210 40% 96%;
-    --sidebar-border: 220 15% 16%;
-    --sidebar-ring: 195 100% 50%;
+    --sidebar-border: 265 18% 18%;
+    --sidebar-ring: 270 85% 60%;
   }
 }
 
@@ -91,7 +91,7 @@
 
   .card-frost {
     @apply rounded-[20px] p-5 border border-primary/10;
-    background: linear-gradient(135deg, hsl(220 20% 10% / 0.9), hsl(220 20% 12% / 0.8));
+    background: linear-gradient(135deg, hsl(265 24% 10% / 0.9), hsl(265 22% 13% / 0.8));
     box-shadow: 0 0 40px -10px hsl(var(--frost-glow) / 0.08),
                 0 8px 32px -4px rgba(0, 0, 0, 0.3),
                 inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
@@ -111,16 +111,16 @@
 
   .btn-primary-full {
     @apply w-full py-4 font-bold rounded-[14px] text-base transition-all duration-200;
-    background: linear-gradient(135deg, hsl(195 100% 50%), hsl(195 100% 40%));
+    background: linear-gradient(135deg, hsl(270 85% 60%), hsl(270 85% 48%));
     color: hsl(var(--primary-foreground));
     min-height: 52px;
-    box-shadow: 0 4px 20px -4px hsl(195 100% 50% / 0.35),
-                inset 0 1px 0 0 hsl(195 100% 70% / 0.2);
+    box-shadow: 0 4px 20px -4px hsl(270 85% 60% / 0.35),
+                inset 0 1px 0 0 hsl(270 85% 78% / 0.2);
   }
 
   .btn-primary-full:hover {
-    box-shadow: 0 4px 28px -4px hsl(195 100% 50% / 0.5),
-                inset 0 1px 0 0 hsl(195 100% 70% / 0.3);
+    box-shadow: 0 4px 28px -4px hsl(270 85% 60% / 0.5),
+                inset 0 1px 0 0 hsl(270 85% 78% / 0.3);
   }
 
   .btn-primary-full:disabled {
@@ -129,11 +129,11 @@
 
   .btn-game-full {
     @apply w-full py-4 font-bold rounded-[14px] text-base transition-all duration-200;
-    background: linear-gradient(135deg, hsl(263 70% 55%), hsl(263 70% 45%));
+    background: linear-gradient(135deg, hsl(300 80% 58%), hsl(300 80% 46%));
     color: hsl(var(--accent-foreground));
     min-height: 52px;
-    box-shadow: 0 4px 20px -4px hsl(263 70% 55% / 0.35),
-                inset 0 1px 0 0 hsl(263 70% 70% / 0.2);
+    box-shadow: 0 4px 20px -4px hsl(300 80% 58% / 0.35),
+                inset 0 1px 0 0 hsl(300 80% 75% / 0.2);
   }
 
   .progress-track {
@@ -142,12 +142,12 @@
 
   .progress-fill {
     @apply h-full rounded-full transition-all duration-700;
-    background: linear-gradient(90deg, hsl(195 100% 50%), hsl(195 100% 40%));
+    background: linear-gradient(90deg, hsl(270 85% 60%), hsl(270 85% 48%));
   }
 
   .progress-fill-accent {
     @apply h-full rounded-full transition-all duration-500;
-    background: linear-gradient(90deg, hsl(263 70% 55%), hsl(263 70% 45%));
+    background: linear-gradient(90deg, hsl(300 80% 58%), hsl(300 80% 46%));
   }
 
   .progress-fill-danger {
@@ -173,22 +173,22 @@
   }
 
   .frost-glow {
-    box-shadow: 0 0 60px -15px hsl(195 100% 50% / 0.15);
+    box-shadow: 0 0 60px -15px hsl(270 85% 60% / 0.15);
   }
 
   .game-glow {
-    box-shadow: 0 0 60px -15px hsl(263 70% 55% / 0.15);
+    box-shadow: 0 0 60px -15px hsl(300 80% 58% / 0.15);
   }
 
   .text-gradient-frost {
-    background: linear-gradient(135deg, hsl(195 100% 55%), hsl(195 100% 70%));
+    background: linear-gradient(135deg, hsl(270 85% 65%), hsl(270 85% 78%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .text-gradient-game {
-    background: linear-gradient(135deg, hsl(263 70% 60%), hsl(263 70% 75%));
+    background: linear-gradient(135deg, hsl(300 80% 62%), hsl(300 80% 78%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
