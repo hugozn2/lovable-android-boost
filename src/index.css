@@ -31,10 +31,10 @@
     --destructive-foreground: 210 40% 98%;
 
     --success: 160 70% 42%;
-    --success-foreground: 220 25% 6%;
+    --success-foreground: 265 30% 6%;
 
     --warning: 38 92% 55%;
-    --warning-foreground: 220 25% 6%;
+    --warning-foreground: 265 30% 6%;
 
     --border: 265 18% 18%;
     --input: 265 18% 18%;
@@ -51,7 +51,7 @@
     --sidebar-background: 265 30% 6%;
     --sidebar-foreground: 210 40% 96%;
     --sidebar-primary: 270 85% 60%;
-    --sidebar-primary-foreground: 220 25% 6%;
+    --sidebar-primary-foreground: 265 30% 6%;
     --sidebar-accent: 265 24% 10%;
     --sidebar-accent-foreground: 210 40% 96%;
     --sidebar-border: 265 18% 18%;
