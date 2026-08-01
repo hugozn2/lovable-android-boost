@@ -1008,37 +1008,63 @@ function InicializarPainel()
     local btnREJOIN = criarBotaoMenu("REJOIN", 45, Color3.fromRGB(255, 0, 50))
     btnREJOIN.Position = UDim2.new(0, -88, 0, 45)
 
+    -- ======================================================================
+    -- FÁBRICA DE SLIDERS DE VELOCIDADE
+    -- Assinatura e lógica interna preservadas: apenas a apresentação mudou,
+    -- para que o slider viva dentro da lista de módulos, logo abaixo do
+    -- toggle que ele controla.
+    -- ======================================================================
     local function criarSlider(nome, posY, min, max, padrao, tipoChave, corFill)
-        local sliderFrame = Instance.new("Frame", mainFrame)
-        sliderFrame.Size = UDim2.new(0, 135, 0, 42)
-        sliderFrame.Position = UDim2.new(1, 95, 0, posY)
-        sliderFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 18)
-        Instance.new("UICorner", sliderFrame).CornerRadius = UDim.new(0, 8)
+        local sliderFrame = Instance.new("Frame", listaControles)
+        sliderFrame.Name = "Slider_" .. nome
+        sliderFrame.Size = UDim2.new(1, -6, 0, 46)
+        sliderFrame.BackgroundColor3 = Color3.fromRGB(17, 19, 26)
+        sliderFrame.BackgroundTransparency = 0.4
+        sliderFrame.BorderSizePixel = 0
+        -- +2 garante que o slider apareça imediatamente abaixo do seu toggle
+        sliderFrame.LayoutOrder = posY + 2
+        sliderFrame.ZIndex = 4
+        Instance.new("UICorner", sliderFrame).CornerRadius = UDim.new(0, 10)
         local sfStroke = Instance.new("UIStroke", sliderFrame)
         sfStroke.Color = corFill
         sfStroke.Thickness = 1
+        sfStroke.Transparency = 0.85
 
         local sliderBar = Instance.new("Frame", sliderFrame)
-        sliderBar.Size = UDim2.new(0.8, 0, 0, 4)
-        sliderBar.Position = UDim2.new(0.1, 0, 0.7, 0)
-        sliderBar.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+        sliderBar.Size = UDim2.new(1, -32, 0, 5)
+        sliderBar.Position = UDim2.new(0, 16, 0, 31)
+        sliderBar.BackgroundColor3 = Color3.fromRGB(34, 38, 48)
+        sliderBar.BorderSizePixel = 0
+        sliderBar.ZIndex = 5
+        Instance.new("UICorner", sliderBar).CornerRadius = UDim.new(1, 0)
 
         local sliderFill = Instance.new("Frame", sliderBar)
         sliderFill.BackgroundColor3 = corFill
-        
+        sliderFill.BorderSizePixel = 0
+        sliderFill.ZIndex = 5
+        Instance.new("UICorner", sliderFill).CornerRadius = UDim.new(1, 0)
+
         local sliderBtn = Instance.new("TextButton", sliderBar)
-        sliderBtn.Size = UDim2.new(0, 12, 0, 12)
+        sliderBtn.Size = UDim2.new(0, 14, 0, 14)
         sliderBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        sliderBtn.AutoButtonColor = false
         sliderBtn.Text = ""
-        Instance.new("UICorner", sliderBtn)
+        sliderBtn.BorderSizePixel = 0
+        sliderBtn.ZIndex = 7
+        Instance.new("UICorner", sliderBtn).CornerRadius = UDim.new(1, 0)
+        local sbtStroke = Instance.new("UIStroke", sliderBtn)
+        sbtStroke.Color = corFill
+        sbtStroke.Thickness = 2
 
         local label = Instance.new("TextLabel", sliderFrame)
-        label.Size = UDim2.new(1, 0, 0.5, 0)
-        label.Position = UDim2.new(0, 0, 0.1, 0)
+        label.Size = UDim2.new(1, -32, 0, 20)
+        label.Position = UDim2.new(0, 16, 0, 6)
         label.TextColor3 = corFill
         label.BackgroundTransparency = 1
-        label.Font = Enum.Font.GothamMedium
-        label.TextSize = 9
+        label.Font = Enum.Font.GothamBold
+        label.TextSize = 10
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.ZIndex = 5
 
         local function atualizar(percent)
             percent = math.clamp(percent, 0, 1)
@@ -1069,39 +1095,77 @@ function InicializarPainel()
     criarSlider("NEON VEL", 155, 20, 400, 100, "Fly", Color3.fromRGB(0, 255, 255))
     criarSlider("DASH VEL", 265, 10, 500, 150, "Dash", Color3.fromRGB(255, 0, 255))
 
-    local searchBar = Instance.new("TextBox", mainFrame)
-    searchBar.Size = UDim2.new(0, 336, 0, 35)
-    searchBar.Position = UDim2.new(0, 12, 0, 52)
-    searchBar.BackgroundColor3 = Color3.fromRGB(14, 14, 18)
-    searchBar.PlaceholderText = "Pesquisar nome ou @usuário..."
+    -- ======================================================================
+    -- PAINEL DE TELEPORTE (COLUNA DIREITA, AO LADO DOS TOGGLES)
+    -- ======================================================================
+    local searchBar = Instance.new("TextBox", cartaoTP)
+    searchBar.Name = "BarraPesquisa"
+    searchBar.Size = UDim2.new(1, -20, 0, 32)
+    searchBar.Position = UDim2.new(0, 10, 0, 34)
+    searchBar.BackgroundColor3 = Color3.fromRGB(11, 13, 18)
+    searchBar.BackgroundTransparency = 0.15
+    searchBar.BorderSizePixel = 0
+    searchBar.PlaceholderText = "  Pesquisar nome ou @usuário..."
     searchBar.Text = ""
-    searchBar.TextColor3 = Color3.fromRGB(0, 255, 255)
-    searchBar.PlaceholderColor3 = Color3.fromRGB(50, 75, 75)
+    searchBar.TextColor3 = COR_ACENTO
+    searchBar.PlaceholderColor3 = Color3.fromRGB(74, 90, 96)
     searchBar.Font = Enum.Font.Gotham
-    searchBar.TextSize = 8
-    Instance.new("UICorner", searchBar).CornerRadius = UDim.new(0, 8)
+    searchBar.TextSize = 10
+    searchBar.ClearTextOnFocus = false
+    searchBar.TextXAlignment = Enum.TextXAlignment.Left
+    searchBar.ZIndex = 5
+    Instance.new("UICorner", searchBar).CornerRadius = UDim.new(0, 9)
+    local sbPad = Instance.new("UIPadding", searchBar)
+    sbPad.PaddingLeft = UDim.new(0, 10)
     local sbStroke = Instance.new("UIStroke", searchBar)
-    sbStroke.Color = Color3.fromRGB(0, 255, 255)
+    sbStroke.Color = COR_ACENTO
+    sbStroke.Transparency = 0.7
+    searchBar.Focused:Connect(function()
+        TweenService:Create(sbStroke, TweenInfo.new(0.15), {Transparency = 0.15}):Play()
+    end)
+    searchBar.FocusLost:Connect(function()
+        TweenService:Create(sbStroke, TweenInfo.new(0.15), {Transparency = 0.7}):Play()
+    end)
 
-    local scroll = Instance.new("ScrollingFrame", mainFrame)
-    scroll.Size = UDim2.new(1, -24, 1, -165)
-    scroll.Position = UDim2.new(0, 12, 0, 98)
-    scroll.BackgroundTransparency = 1; scroll.ScrollBarThickness = 2
-    scroll.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 255)
+    local scroll = Instance.new("ScrollingFrame", cartaoTP)
+    scroll.Name = "ListaJogadores"
+    scroll.Size = UDim2.new(1, -20, 1, -128)
+    scroll.Position = UDim2.new(0, 10, 0, 74)
+    scroll.BackgroundTransparency = 1
+    scroll.BorderSizePixel = 0
+    scroll.ScrollBarThickness = 3
+    scroll.ScrollBarImageColor3 = COR_ACENTO
+    scroll.ScrollBarImageTransparency = 0.4
+    scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scroll.ZIndex = 5
     local listLayout = Instance.new("UIListLayout", scroll)
     listLayout.Padding = UDim.new(0, 6)
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    local refreshBtn = Instance.new("TextButton", mainFrame)
-    refreshBtn.Size = UDim2.new(0, 336, 0, 38)
-    refreshBtn.Position = UDim2.new(0, 12, 1, -48)
-    refreshBtn.BackgroundColor3 = Color3.fromRGB(14, 14, 18)
-    refreshBtn.Text = "ATUALIZAR LISTA JOGADORES"
-    refreshBtn.TextColor3 = Color3.fromRGB(0, 255, 255)
-    refreshBtn.Font = Enum.Font.GothamMedium
-    refreshBtn.TextSize = 8
-    Instance.new("UICorner", refreshBtn).CornerRadius = UDim.new(0, 8)
+    local refreshBtn = Instance.new("TextButton", cartaoTP)
+    refreshBtn.Name = "BotaoAtualizar"
+    refreshBtn.Size = UDim2.new(1, -20, 0, 36)
+    refreshBtn.Position = UDim2.new(0, 10, 1, -46)
+    refreshBtn.BackgroundColor3 = Color3.fromRGB(11, 13, 18)
+    refreshBtn.BackgroundTransparency = 0.15
+    refreshBtn.AutoButtonColor = false
+    refreshBtn.Text = "\u{21BB}  ATUALIZAR LISTA DE JOGADORES"
+    refreshBtn.TextColor3 = COR_ACENTO
+    refreshBtn.Font = Enum.Font.GothamBold
+    refreshBtn.TextSize = 9
+    refreshBtn.ZIndex = 5
+    Instance.new("UICorner", refreshBtn).CornerRadius = UDim.new(0, 9)
     local rbStroke = Instance.new("UIStroke", refreshBtn)
-    rbStroke.Color = Color3.fromRGB(0, 255, 255)
+    rbStroke.Color = COR_ACENTO
+    rbStroke.Transparency = 0.55
+    refreshBtn.MouseEnter:Connect(function()
+        TweenService:Create(rbStroke, TweenInfo.new(0.15), {Transparency = 0.1}):Play()
+        TweenService:Create(refreshBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
+    end)
+    refreshBtn.MouseLeave:Connect(function()
+        TweenService:Create(rbStroke, TweenInfo.new(0.15), {Transparency = 0.55}):Play()
+        TweenService:Create(refreshBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.15}):Play()
+    end)
 
     local function updateList()
         for _, item in ipairs(scroll:GetChildren()) do 
