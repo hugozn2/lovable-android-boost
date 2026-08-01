@@ -47,57 +47,333 @@ end
 -- Variável global interna para referenciar o frame principal do menu
 local mainFrameRef = nil
 
+-- Declarações antecipadas (permitem que o botão flutuante reconstrua todo o sistema)
+local InicializarPainel
+local ConstruirBotaoFlutuante
+local ExecutarHardReset
+local HardResetEmAndamento = false
+
+-- Dimensões oficiais do painel (usadas na animação de abertura/fechamento)
+local PAINEL_LARGURA, PAINEL_ALTURA = 740, 520
+
+local menuAnimando = false
 local function AlternarVisibilidadeMenu()
-    if mainFrameRef then
-        mainFrameRef.Visible = not mainFrameRef.Visible
+    if not mainFrameRef or menuAnimando then return end
+    local frame = mainFrameRef
+    local abrindo = not frame.Visible
+
+    menuAnimando = true
+    if abrindo then
+        frame.Visible = true
+        frame.Size = UDim2.new(0, math.floor(PAINEL_LARGURA * 0.86), 0, math.floor(PAINEL_ALTURA * 0.86))
+        frame.BackgroundTransparency = 1
+        local abrir = TweenService:Create(
+            frame,
+            TweenInfo.new(0.28, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            { Size = UDim2.new(0, PAINEL_LARGURA, 0, PAINEL_ALTURA) }
+        )
+        TweenService:Create(frame, TweenInfo.new(0.22), { BackgroundTransparency = 0.06 }):Play()
+        abrir:Play()
+        abrir.Completed:Wait()
+    else
+        local fechar = TweenService:Create(
+            frame,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            { Size = UDim2.new(0, math.floor(PAINEL_LARGURA * 0.88), 0, math.floor(PAINEL_ALTURA * 0.88)), BackgroundTransparency = 1 }
+        )
+        fechar:Play()
+        fechar.Completed:Wait()
+        frame.Visible = false
+        frame.Size = UDim2.new(0, PAINEL_LARGURA, 0, PAINEL_ALTURA)
+        frame.BackgroundTransparency = 0.06
     end
+    menuAnimando = false
 end
 
 -- [[ INTERFACE DO BOTÃO FLUTUANTE DE ATIVAÇÃO ]] --
-local ScreenGuiMaster = Instance.new("ScreenGui")
-ScreenGuiMaster.Name = NOME_PAINEL
-ScreenGuiMaster.ResetOnSpawn = false
-ScreenGuiMaster.DisplayOrder = 2147483647 -- Força o botão a ficar na camada mais alta
-ScreenGuiMaster.Parent = SuporteGui
+-- Clique simples: abre/fecha o painel.
+-- Clique duplo (dois toques em até 0.4s): HARD RESET + reinicialização total do código.
 
-local BotaoReset = Instance.new("TextButton")
-BotaoReset.Size = UDim2.new(0, 45, 0, 45)
-BotaoReset.Position = UDim2.new(0.5, -22, 0.85, 0)
-BotaoReset.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-BotaoReset.BackgroundTransparency = 0.4
-BotaoReset.Text = "⚡"
-BotaoReset.Font = Enum.Font.GothamBold
-BotaoReset.TextColor3 = Color3.fromRGB(0, 0, 0)
-BotaoReset.TextSize = 18
-BotaoReset.Parent = ScreenGuiMaster
+local ScreenGuiMaster, BotaoReset
 
-local ResetStroke = Instance.new("UIStroke", BotaoReset)
-ResetStroke.Color = Color3.fromRGB(0, 255, 255)
-ResetStroke.Thickness = 2
-Instance.new("UICorner", BotaoReset).CornerRadius = UDim.new(1, 0)
+ConstruirBotaoFlutuante = function()
+    -- Remove qualquer instância anterior do botão flutuante
+    pcall(function()
+        for _, gui in ipairs(SuporteGui:GetChildren()) do
+            if gui.Name == NOME_PAINEL then gui:Destroy() end
+        end
+    end)
 
-local dragAtivo, dragStart, startPos
-table.insert(conexoesParaLimpar, BotaoReset.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragAtivo = true; dragStart = input.Position; startPos = BotaoReset.Position
-    end
-end))
-table.insert(conexoesParaLimpar, UserInputService.InputChanged:Connect(function(input)
-    if dragAtivo and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        BotaoReset.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end))
-table.insert(conexoesParaLimpar, UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragAtivo = false end
-end))
+    ScreenGuiMaster = Instance.new("ScreenGui")
+    ScreenGuiMaster.Name = NOME_PAINEL
+    ScreenGuiMaster.ResetOnSpawn = false
+    ScreenGuiMaster.IgnoreGuiInset = true
+    ScreenGuiMaster.DisplayOrder = 2147483647
+    ScreenGuiMaster.Parent = SuporteGui
 
-table.insert(conexoesParaLimpar, BotaoReset.MouseButton1Click:Connect(function()
-    AlternarVisibilidadeMenu()
-end))
+    BotaoReset = Instance.new("TextButton")
+    BotaoReset.Name = "GatilhoFlutuante"
+    BotaoReset.Size = UDim2.new(0, 48, 0, 48)
+    BotaoReset.Position = UDim2.new(0.5, -24, 0.85, 0)
+    BotaoReset.BackgroundColor3 = Color3.fromRGB(9, 11, 16)
+    BotaoReset.BackgroundTransparency = 0.15
+    BotaoReset.AutoButtonColor = false
+    BotaoReset.Text = "\u{26A1}"
+    BotaoReset.Font = Enum.Font.GothamBold
+    BotaoReset.TextColor3 = Color3.fromRGB(0, 255, 255)
+    BotaoReset.TextSize = 22
+    BotaoReset.ZIndex = 5
+    BotaoReset.Parent = ScreenGuiMaster
+    Instance.new("UICorner", BotaoReset).CornerRadius = UDim.new(1, 0)
+
+    -- Gradiente interno para dar profundidade
+    local GradienteBotao = Instance.new("UIGradient", BotaoReset)
+    GradienteBotao.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(24, 30, 40)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(6, 8, 12)),
+    })
+    GradienteBotao.Rotation = 90
+
+    local ResetStroke = Instance.new("UIStroke", BotaoReset)
+    ResetStroke.Color = Color3.fromRGB(0, 255, 255)
+    ResetStroke.Thickness = 2
+    ResetStroke.Transparency = 0.1
+
+    -- Halo pulsante ao redor do botão (filho, portanto acompanha o arraste)
+    local Halo = Instance.new("Frame")
+    Halo.Name = "Halo"
+    Halo.AnchorPoint = Vector2.new(0.5, 0.5)
+    Halo.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Halo.Size = UDim2.new(1, 8, 1, 8)
+    Halo.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+    Halo.BackgroundTransparency = 0.82
+    Halo.BorderSizePixel = 0
+    Halo.ZIndex = 1
+    Halo.Parent = BotaoReset
+    Instance.new("UICorner", Halo).CornerRadius = UDim.new(1, 0)
+
+    -- Etiqueta de status (aparece durante o hard reset)
+    local Etiqueta = Instance.new("TextLabel")
+    Etiqueta.Name = "Etiqueta"
+    Etiqueta.AnchorPoint = Vector2.new(0.5, 1)
+    Etiqueta.Position = UDim2.new(0.5, 0, 0, -6)
+    Etiqueta.Size = UDim2.new(0, 150, 0, 20)
+    Etiqueta.BackgroundColor3 = Color3.fromRGB(9, 11, 16)
+    Etiqueta.BackgroundTransparency = 0.1
+    Etiqueta.Text = ""
+    Etiqueta.TextColor3 = Color3.fromRGB(255, 70, 90)
+    Etiqueta.Font = Enum.Font.GothamBold
+    Etiqueta.TextSize = 10
+    Etiqueta.Visible = false
+    Etiqueta.ZIndex = 6
+    Etiqueta.Parent = BotaoReset
+    Instance.new("UICorner", Etiqueta).CornerRadius = UDim.new(0, 6)
+    local EtiquetaStroke = Instance.new("UIStroke", Etiqueta)
+    EtiquetaStroke.Color = Color3.fromRGB(255, 70, 90)
+    EtiquetaStroke.Transparency = 0.35
+
+    -- Pulso contínuo do halo
+    task.spawn(function()
+        local versaoLocal = _G.VersaoAtual
+        while versaoLocal == _G.VersaoAtual and Halo.Parent do
+            pcall(function()
+                TweenService:Create(Halo, TweenInfo.new(0.9, Enum.EasingStyle.Sine), {
+                    Size = UDim2.new(1, 18, 1, 18), BackgroundTransparency = 0.95
+                }):Play()
+            end)
+            task.wait(0.95)
+            pcall(function()
+                TweenService:Create(Halo, TweenInfo.new(0.9, Enum.EasingStyle.Sine), {
+                    Size = UDim2.new(1, 6, 1, 6), BackgroundTransparency = 0.8
+                }):Play()
+            end)
+            task.wait(0.95)
+        end
+    end)
+
+    -- [[ ARRASTE COM DETECÇÃO DE CLIQUE REAL ]] --
+    -- Um movimento acima de 6px é considerado arraste e cancela o clique,
+    -- evitando que reposicionar o botão abra o painel por acidente.
+    local dragAtivo, dragStart, startPos = false, nil, nil
+    local houveArraste = false
+
+    table.insert(conexoesParaLimpar, BotaoReset.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragAtivo = true
+            houveArraste = false
+            dragStart = input.Position
+            startPos = BotaoReset.Position
+            TweenService:Create(BotaoReset, TweenInfo.new(0.1), { Size = UDim2.new(0, 43, 0, 43) }):Play()
+        end
+    end))
+
+    table.insert(conexoesParaLimpar, UserInputService.InputChanged:Connect(function(input)
+        if not dragAtivo then return end
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - dragStart
+            if math.abs(delta.X) > 6 or math.abs(delta.Y) > 6 then houveArraste = true end
+            BotaoReset.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end))
+
+    table.insert(conexoesParaLimpar, UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            if dragAtivo then
+                TweenService:Create(BotaoReset, TweenInfo.new(0.14, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, 48, 0, 48)
+                }):Play()
+            end
+            dragAtivo = false
+        end
+    end))
+
+    -- [[ CLIQUE SIMPLES x CLIQUE DUPLO ]] --
+    local INTERVALO_DUPLO = 0.4
+    local ultimoClique = 0
+    local cliquePendente = nil
+
+    table.insert(conexoesParaLimpar, BotaoReset.MouseButton1Click:Connect(function()
+        -- Arrastar nunca deve contar como clique
+        if houveArraste then houveArraste = false return end
+        if HardResetEmAndamento then return end
+
+        local agora = os.clock()
+        if agora - ultimoClique <= INTERVALO_DUPLO then
+            -- Segundo toque dentro da janela: cancela a abertura e dispara o hard reset
+            ultimoClique = 0
+            if cliquePendente then
+                pcall(function() task.cancel(cliquePendente) end)
+                cliquePendente = nil
+            end
+            task.spawn(ExecutarHardReset)
+        else
+            ultimoClique = agora
+            -- Aguarda a janela do clique duplo antes de alternar o painel
+            cliquePendente = task.delay(INTERVALO_DUPLO, function()
+                cliquePendente = nil
+                if HardResetEmAndamento then return end
+                AlternarVisibilidadeMenu()
+            end)
+        end
+    end))
+
+    return BotaoReset, ResetStroke, Etiqueta, Halo
+end
+
+-- [[ HARD RESET + REINICIALIZAÇÃO TOTAL DO CÓDIGO ]] --
+ExecutarHardReset = function()
+    if HardResetEmAndamento then return end
+    HardResetEmAndamento = true
+
+    local botao = BotaoReset
+    local etiqueta = botao and botao:FindFirstChild("Etiqueta")
+    local stroke = botao and botao:FindFirstChildOfClass("UIStroke")
+
+    -- Feedback visual imediato
+    pcall(function()
+        botao.Text = "\u{27F3}"
+        botao.TextColor3 = Color3.fromRGB(255, 70, 90)
+        if stroke then stroke.Color = Color3.fromRGB(255, 70, 90) end
+        if etiqueta then
+            etiqueta.Visible = true
+            etiqueta.Text = "HARD RESET EM ANDAMENTO..."
+        end
+        local halo = botao:FindFirstChild("Halo")
+        if halo then halo.BackgroundColor3 = Color3.fromRGB(255, 70, 90) end
+    end)
+
+    -- ETAPA 1: invalida a versão atual, encerrando todos os laços em execução
+    _G.VersaoAtual = _G.VersaoAtual + 1
+
+    -- ETAPA 2: desconecta todas as conexões registradas
+    pcall(_G.LimparConexoesGlobais)
+
+    -- ETAPA 3: restaura o personagem para o estado limpo
+    pcall(function()
+        local char = player.Character
+        if char then
+            for _, obj in ipairs(char:GetDescendants()) do
+                if obj:IsA("BodyVelocity") or obj:IsA("BodyGyro") or obj:IsA("BodyPosition")
+                   or obj:IsA("AlignPosition") or obj:IsA("AlignOrientation") or obj:IsA("LinearVelocity")
+                   or obj:IsA("AngularVelocity") then
+                    obj:Destroy()
+                end
+                if obj:IsA("BasePart") then
+                    obj.CanCollide = true
+                    obj.LocalTransparencyModifier = 0
+                end
+            end
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.WalkSpeed = 16
+                hum.JumpPower = 50
+                hum.PlatformStand = false
+                hum.AutoRotate = true
+                for _, track in ipairs(hum:GetPlayingAnimationTracks()) do
+                    pcall(function() track:Stop(0) end)
+                end
+                hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+            end
+        end
+    end)
+
+    -- ETAPA 4: restaura câmera e sensibilidade
+    pcall(function()
+        local cam = workspace.CurrentCamera
+        if cam then cam.FieldOfView = 70 end
+    end)
+
+    -- ETAPA 5: remove plataformas/rastros deixados no mundo
+    pcall(function()
+        for _, obj in ipairs(workspace:GetChildren()) do
+            if obj:IsA("BasePart") and (obj.Name == "PlataformaAgua" or obj.Name == "PlataformaNeon") then
+                obj:Destroy()
+            end
+        end
+    end)
+
+    -- ETAPA 6: destrói todas as interfaces geradas pelo painel
+    pcall(function()
+        local alvos = { "PainelNeonV17_Main", NOME_PAINEL }
+        for _, nome in ipairs(alvos) do
+            for _, gui in ipairs(SuporteGui:GetChildren()) do
+                if gui.Name == nome then gui:Destroy() end
+            end
+        end
+        local pg = player:FindFirstChild("PlayerGui")
+        if pg then
+            for _, gui in ipairs(pg:GetChildren()) do
+                if gui.Name == "PainelNeonV17_Main" or gui.Name == NOME_PAINEL then gui:Destroy() end
+            end
+        end
+    end)
+    mainFrameRef = nil
+    menuAnimando = false
+
+    -- ETAPA 7: reset físico do avatar (quebra as juntas para forçar respawn limpo)
+    pcall(function()
+        if player.Character then player.Character:BreakJoints() end
+    end)
+
+    -- ETAPA 8: janela de segurança para que TODOS os laços antigos encerrem
+    -- (alguns usam task.wait de até 1s antes de reavaliar a versão)
+    task.wait(1.25)
+
+    -- ETAPA 9: revalida a versão para a nova execução e reconstrói o sistema inteiro
+    ID_EXECUCAO = _G.VersaoAtual
+    ConstruirBotaoFlutuante()
+    task.spawn(InicializarPainel)
+
+    HardResetEmAndamento = false
+end
+
+ConstruirBotaoFlutuante()
 
 -- [[ NÚCLEO DO PAINEL PRINCIPAL ]] --
-local function InicializarPainel()
+function InicializarPainel()
     local mouse = player:GetMouse()
     local camera = workspace.CurrentCamera
     local PlayerGui = player:WaitForChild("PlayerGui", 15)
