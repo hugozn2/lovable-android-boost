@@ -488,41 +488,108 @@ function InicializarPainel()
     screenGui.DisplayOrder = 2147483647 -- Força o painel a ficar na camada mais alta
     screenGui.Parent = SuporteGui -- Envia para o CoreGui em vez do PlayerGui
 
+    -- ======================================================================
+    -- SHELL PRINCIPAL DO PAINEL (LAYOUT PROFISSIONAL EM DUAS COLUNAS)
+    -- Coluna esquerda : módulos de controle com toggles deslizantes
+    -- Coluna direita  : painel de teleporte de jogadores
+    -- ======================================================================
+
+    local COR_ACENTO      = Color3.fromRGB(0, 255, 255)
+    local COR_ATIVO       = Color3.fromRGB(0, 255, 150)
+    local COR_SUPERFICIE  = Color3.fromRGB(15, 17, 23)
+    local COR_ELEVADA     = Color3.fromRGB(21, 24, 32)
+    local COR_TEXTO       = Color3.fromRGB(232, 240, 245)
+    local COR_TEXTO_FRACO = Color3.fromRGB(120, 134, 148)
+
+    -- Sombra projetada atrás do painel (dá profundidade real ao conjunto)
+    local sombra = Instance.new("Frame", screenGui)
+    sombra.AnchorPoint = Vector2.new(0.5, 0.5)
+    sombra.Size = UDim2.new(0, PAINEL_LARGURA + 26, 0, PAINEL_ALTURA + 26)
+    sombra.Position = UDim2.new(0.5, 0, 0.5, 0)
+    sombra.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    sombra.BackgroundTransparency = 0.62
+    sombra.BorderSizePixel = 0
+    sombra.ZIndex = 0
+    Instance.new("UICorner", sombra).CornerRadius = UDim.new(0, 20)
+
     local mainFrame = Instance.new("Frame", screenGui)
-    mainFrame.Size = UDim2.new(0, 360, 0, 480)
-    mainFrame.Position = UDim2.new(0.5, -180, 0.5, -240)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
-    mainFrame.BackgroundTransparency = 0.25 
-    mainFrame.Visible = true 
-    Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
-    mainFrameRef = mainFrame 
+    mainFrame.Name = "ShellPrincipal"
+    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    mainFrame.Size = UDim2.new(0, PAINEL_LARGURA, 0, PAINEL_ALTURA)
+    mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(10, 11, 15)
+    mainFrame.BackgroundTransparency = 0.06
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Active = true
+    mainFrame.Visible = true
+    mainFrame.ZIndex = 2
+    Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 14)
+    mainFrameRef = mainFrame
+
+    -- A sombra acompanha o painel enquanto ele é arrastado
+    table.insert(conexoesParaLimpar, mainFrame:GetPropertyChangedSignal("Position"):Connect(function()
+        sombra.Position = mainFrame.Position
+    end))
+    table.insert(conexoesParaLimpar, mainFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+        sombra.Visible = mainFrame.Visible
+    end))
+
+    local fundoGradiente = Instance.new("UIGradient", mainFrame)
+    fundoGradiente.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 24, 33)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 9, 13)),
+    })
+    fundoGradiente.Rotation = 115
 
     local mainStroke = Instance.new("UIStroke", mainFrame)
-    mainStroke.Color = Color3.fromRGB(0, 255, 255)
+    mainStroke.Color = COR_ACENTO
     mainStroke.Thickness = 1.5
+    mainStroke.Transparency = 0.35
 
+    -- ---------------------------------------------------------------- BARRA SUPERIOR
     local topBar = Instance.new("Frame", mainFrame)
-    topBar.Size = UDim2.new(1, 0, 0, 42)
-    topBar.BackgroundColor3 = Color3.fromRGB(16, 16, 20)
-    topBar.BackgroundTransparency = 0.15
-    Instance.new("UICorner", topBar).CornerRadius = UDim.new(0, 12)
-    local topStroke = Instance.new("UIStroke", topBar)
-    topStroke.Color = Color3.fromRGB(0, 255, 255)
+    topBar.Name = "BarraSuperior"
+    topBar.Size = UDim2.new(1, 0, 0, 46)
+    topBar.BackgroundColor3 = Color3.fromRGB(13, 15, 21)
+    topBar.BackgroundTransparency = 0.1
+    topBar.BorderSizePixel = 0
+    topBar.Active = true
+    topBar.ZIndex = 3
+    Instance.new("UICorner", topBar).CornerRadius = UDim.new(0, 14)
+
+    -- Máscara para que o canto inferior da barra fique reto
+    local topBarBase = Instance.new("Frame", topBar)
+    topBarBase.Size = UDim2.new(1, 0, 0, 14)
+    topBarBase.Position = UDim2.new(0, 0, 1, -14)
+    topBarBase.BackgroundColor3 = Color3.fromRGB(13, 15, 21)
+    topBarBase.BackgroundTransparency = 0.1
+    topBarBase.BorderSizePixel = 0
+    topBarBase.ZIndex = 3
+
+    -- Linha de acento sob a barra superior
+    local linhaAcento = Instance.new("Frame", topBar)
+    linhaAcento.Size = UDim2.new(1, 0, 0, 1)
+    linhaAcento.Position = UDim2.new(0, 0, 1, -1)
+    linhaAcento.BackgroundColor3 = COR_ACENTO
+    linhaAcento.BackgroundTransparency = 0.55
+    linhaAcento.BorderSizePixel = 0
+    linhaAcento.ZIndex = 4
 
     local raioAnimado = Instance.new("TextLabel", topBar)
-    raioAnimado.Size = UDim2.new(0, 50, 1, 0)
-    raioAnimado.Position = UDim2.new(0, 12, 0, 0)
-    raioAnimado.Text = "⚡"
-    raioAnimado.TextColor3 = Color3.fromRGB(0, 255, 255)
+    raioAnimado.Size = UDim2.new(0, 30, 1, 0)
+    raioAnimado.Position = UDim2.new(0, 14, 0, 0)
+    raioAnimado.Text = "\u{26A1}"
+    raioAnimado.TextColor3 = COR_ACENTO
     raioAnimado.BackgroundTransparency = 1
     raioAnimado.Font = Enum.Font.GothamBold
     raioAnimado.TextSize = 20
-    raioAnimado.TextXAlignment = Enum.TextXAlignment.Left
+    raioAnimado.TextXAlignment = Enum.TextXAlignment.Center
+    raioAnimado.ZIndex = 5
 
     task.spawn(function()
         while ID_EXECUCAO == _G.VersaoAtual and task.wait(0.5) do
             pcall(function()
-                local corAlvo = raioAnimado.TextColor3 == Color3.fromRGB(0, 255, 255) and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(0, 255, 255)
+                local corAlvo = raioAnimado.TextColor3 == COR_ACENTO and Color3.fromRGB(255, 255, 255) or COR_ACENTO
                 local tamAlvo = raioAnimado.TextSize == 20 and 24 or 20
                 TweenService:Create(raioAnimado, TweenInfo.new(0.4), {TextColor3 = corAlvo, TextSize = tamAlvo}):Play()
             end)
@@ -530,28 +597,404 @@ function InicializarPainel()
     end)
 
     local titleLabel = Instance.new("TextLabel", topBar)
-    titleLabel.Size = UDim2.new(1, -60, 1, 0)
-    titleLabel.Position = UDim2.new(0, 50, 0, 0)
-    titleLabel.Text = "⚡ PAINEL DO SEVEN [P]"
-    titleLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
+    titleLabel.Size = UDim2.new(0, 240, 0, 16)
+    titleLabel.Position = UDim2.new(0, 48, 0, 8)
+    titleLabel.Text = "PAINEL DO SEVEN"
+    titleLabel.TextColor3 = COR_TEXTO
     titleLabel.BackgroundTransparency = 1
-    titleLabel.Font = Enum.Font.GothamMedium 
-    titleLabel.TextSize = 8
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 13
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.ZIndex = 5
 
+    local subtitleLabel = Instance.new("TextLabel", topBar)
+    subtitleLabel.Size = UDim2.new(0, 300, 0, 12)
+    subtitleLabel.Position = UDim2.new(0, 48, 0, 24)
+    subtitleLabel.Text = "v1.0.8  \u{2022}  [P] alternar  \u{2022}  toque 2x no \u{26A1} = HARD RESET"
+    subtitleLabel.TextColor3 = COR_TEXTO_FRACO
+    subtitleLabel.BackgroundTransparency = 1
+    subtitleLabel.Font = Enum.Font.Gotham
+    subtitleLabel.TextSize = 9
+    subtitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    subtitleLabel.ZIndex = 5
+
+    -- Indicador de sistema on-line
+    local pilulaStatus = Instance.new("Frame", topBar)
+    pilulaStatus.Size = UDim2.new(0, 86, 0, 22)
+    pilulaStatus.Position = UDim2.new(1, -128, 0.5, -11)
+    pilulaStatus.BackgroundColor3 = Color3.fromRGB(0, 60, 45)
+    pilulaStatus.BackgroundTransparency = 0.25
+    pilulaStatus.BorderSizePixel = 0
+    pilulaStatus.ZIndex = 5
+    Instance.new("UICorner", pilulaStatus).CornerRadius = UDim.new(1, 0)
+    local psStroke = Instance.new("UIStroke", pilulaStatus)
+    psStroke.Color = COR_ATIVO
+    psStroke.Transparency = 0.5
+
+    local pontoStatus = Instance.new("Frame", pilulaStatus)
+    pontoStatus.Size = UDim2.new(0, 6, 0, 6)
+    pontoStatus.Position = UDim2.new(0, 9, 0.5, -3)
+    pontoStatus.BackgroundColor3 = COR_ATIVO
+    pontoStatus.BorderSizePixel = 0
+    pontoStatus.ZIndex = 6
+    Instance.new("UICorner", pontoStatus).CornerRadius = UDim.new(1, 0)
+
+    local textoStatus = Instance.new("TextLabel", pilulaStatus)
+    textoStatus.Size = UDim2.new(1, -20, 1, 0)
+    textoStatus.Position = UDim2.new(0, 20, 0, 0)
+    textoStatus.BackgroundTransparency = 1
+    textoStatus.Text = "OPERANTE"
+    textoStatus.TextColor3 = COR_ATIVO
+    textoStatus.Font = Enum.Font.GothamBold
+    textoStatus.TextSize = 9
+    textoStatus.TextXAlignment = Enum.TextXAlignment.Left
+    textoStatus.ZIndex = 6
+
+    task.spawn(function()
+        while ID_EXECUCAO == _G.VersaoAtual and task.wait(0.8) do
+            pcall(function()
+                TweenService:Create(pontoStatus, TweenInfo.new(0.7), {
+                    BackgroundTransparency = pontoStatus.BackgroundTransparency > 0.4 and 0 or 0.7
+                }):Play()
+            end)
+        end
+    end)
+
+    -- Botão de minimizar
+    local btnMinimizar = Instance.new("TextButton", topBar)
+    btnMinimizar.Size = UDim2.new(0, 28, 0, 28)
+    btnMinimizar.Position = UDim2.new(1, -34, 0.5, -14)
+    btnMinimizar.BackgroundColor3 = Color3.fromRGB(26, 30, 40)
+    btnMinimizar.BackgroundTransparency = 0.2
+    btnMinimizar.AutoButtonColor = false
+    btnMinimizar.Text = "\u{2013}"
+    btnMinimizar.TextColor3 = COR_TEXTO_FRACO
+    btnMinimizar.Font = Enum.Font.GothamBold
+    btnMinimizar.TextSize = 16
+    btnMinimizar.ZIndex = 6
+    Instance.new("UICorner", btnMinimizar).CornerRadius = UDim.new(0, 8)
+    local bmStroke = Instance.new("UIStroke", btnMinimizar)
+    bmStroke.Color = COR_ACENTO
+    bmStroke.Transparency = 0.7
+    btnMinimizar.MouseEnter:Connect(function()
+        TweenService:Create(bmStroke, TweenInfo.new(0.15), {Transparency = 0.2}):Play()
+        TweenService:Create(btnMinimizar, TweenInfo.new(0.15), {TextColor3 = COR_ACENTO}):Play()
+    end)
+    btnMinimizar.MouseLeave:Connect(function()
+        TweenService:Create(bmStroke, TweenInfo.new(0.15), {Transparency = 0.7}):Play()
+        TweenService:Create(btnMinimizar, TweenInfo.new(0.15), {TextColor3 = COR_TEXTO_FRACO}):Play()
+    end)
+    btnMinimizar.MouseButton1Click:Connect(function()
+        task.spawn(AlternarVisibilidadeMenu)
+    end)
+
+    -- ---------------------------------------------------------------- FÁBRICA DE CARTÕES
+    local function criarCartao(titulo, posX, largura)
+        local cartao = Instance.new("Frame", mainFrame)
+        cartao.Name = "Cartao_" .. titulo
+        cartao.Size = UDim2.new(0, largura, 1, -70)
+        cartao.Position = UDim2.new(0, posX, 0, 58)
+        cartao.BackgroundColor3 = COR_SUPERFICIE
+        cartao.BackgroundTransparency = 0.25
+        cartao.BorderSizePixel = 0
+        cartao.ZIndex = 3
+        Instance.new("UICorner", cartao).CornerRadius = UDim.new(0, 12)
+        local cStroke = Instance.new("UIStroke", cartao)
+        cStroke.Color = COR_ACENTO
+        cStroke.Transparency = 0.78
+
+        local cabecalho = Instance.new("TextLabel", cartao)
+        cabecalho.Size = UDim2.new(1, -24, 0, 26)
+        cabecalho.Position = UDim2.new(0, 14, 0, 6)
+        cabecalho.BackgroundTransparency = 1
+        cabecalho.Text = titulo
+        cabecalho.TextColor3 = COR_TEXTO_FRACO
+        cabecalho.Font = Enum.Font.GothamBold
+        cabecalho.TextSize = 9
+        cabecalho.TextXAlignment = Enum.TextXAlignment.Left
+        cabecalho.ZIndex = 4
+
+        return cartao
+    end
+
+    -- Coluna esquerda: 392px | Coluna direita: 312px  (12 + 392 + 12 + 312 + 12 = 740)
+    local cartaoControles = criarCartao("MÓDULOS DE CONTROLE", 12, 392)
+    local cartaoTP        = criarCartao("TELEPORTE DE JOGADORES", 416, 312)
+
+    -- Lista rolável que recebe todos os toggles deslizantes e sliders
+    local listaControles = Instance.new("ScrollingFrame", cartaoControles)
+    listaControles.Name = "ListaControles"
+    listaControles.Size = UDim2.new(1, -18, 1, -42)
+    listaControles.Position = UDim2.new(0, 9, 0, 34)
+    listaControles.BackgroundTransparency = 1
+    listaControles.BorderSizePixel = 0
+    listaControles.ScrollBarThickness = 3
+    listaControles.ScrollBarImageColor3 = COR_ACENTO
+    listaControles.ScrollBarImageTransparency = 0.4
+    listaControles.CanvasSize = UDim2.new(0, 0, 0, 0)
+    listaControles.ZIndex = 4
+
+    local layoutControles = Instance.new("UIListLayout", listaControles)
+    layoutControles.Padding = UDim.new(0, 7)
+    layoutControles.SortOrder = Enum.SortOrder.LayoutOrder
+
+    table.insert(conexoesParaLimpar, layoutControles:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        listaControles.CanvasSize = UDim2.new(0, 0, 0, layoutControles.AbsoluteContentSize.Y + 6)
+    end))
+
+    -- Cabeçalhos de seção dentro da lista de controles
+    local function criarSecao(texto, ordem)
+        local sec = Instance.new("Frame", listaControles)
+        sec.Size = UDim2.new(1, -6, 0, 20)
+        sec.BackgroundTransparency = 1
+        sec.LayoutOrder = ordem
+        sec.ZIndex = 4
+
+        local traco = Instance.new("Frame", sec)
+        traco.Size = UDim2.new(0, 14, 0, 2)
+        traco.Position = UDim2.new(0, 0, 0.5, -1)
+        traco.BackgroundColor3 = COR_ACENTO
+        traco.BackgroundTransparency = 0.3
+        traco.BorderSizePixel = 0
+
+        local lbl = Instance.new("TextLabel", sec)
+        lbl.Size = UDim2.new(1, -22, 1, 0)
+        lbl.Position = UDim2.new(0, 22, 0, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = texto
+        lbl.TextColor3 = COR_ACENTO
+        lbl.Font = Enum.Font.GothamBold
+        lbl.TextSize = 9
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        return sec
+    end
+
+    criarSecao("MOVIMENTO E COMBATE", 1)
+    criarSecao("PAINÉIS AVANÇADOS", 999)
+
+    -- ======================================================================
+    -- FÁBRICA DE TOGGLES DESLIZANTES
+    -- Mantém a MESMA assinatura e o MESMO retorno (um TextButton) da versão
+    -- anterior, de modo que todo o código de lógica já existente continua
+    -- funcionando sem uma única alteração.
+    --
+    -- Como a animação é sincronizada: todo o código do painel sinaliza estado
+    -- ativo escrevendo BackgroundColor3 = Color3.fromRGB(0, 255, 150) no botão.
+    -- Aqui escutamos essa propriedade e traduzimos em animação do switch.
+    -- ======================================================================
     local function criarBotaoMenu(texto, posY, corNeon)
-        local btn = Instance.new("TextButton", mainFrame)
-        btn.Size = UDim2.new(0, 75, 0, 45)
-        btn.Position = UDim2.new(1, 12, 0, posY)
+        local eAcao = (corNeon == Color3.fromRGB(255, 0, 50))
+
+        local linha = Instance.new("Frame", listaControles)
+        linha.Name = "Linha_" .. texto
+        linha.Size = UDim2.new(1, -6, 0, 44)
+        linha.BackgroundColor3 = COR_ELEVADA
+        linha.BackgroundTransparency = 0.35
+        linha.BorderSizePixel = 0
+        linha.LayoutOrder = posY + 1
+        linha.ZIndex = 4
+        Instance.new("UICorner", linha).CornerRadius = UDim.new(0, 10)
+
+        local linhaStroke = Instance.new("UIStroke", linha)
+        linhaStroke.Color = corNeon
+        linhaStroke.Thickness = 1
+        linhaStroke.Transparency = 0.8
+
+        -- Barra de acento vertical à esquerda
+        local acento = Instance.new("Frame", linha)
+        acento.Size = UDim2.new(0, 3, 1, -18)
+        acento.Position = UDim2.new(0, 0, 0, 9)
+        acento.BackgroundColor3 = corNeon
+        acento.BackgroundTransparency = 0.6
+        acento.BorderSizePixel = 0
+        acento.ZIndex = 5
+        Instance.new("UICorner", acento).CornerRadius = UDim.new(1, 0)
+
+        local rotulo = Instance.new("TextLabel", linha)
+        rotulo.Size = UDim2.new(1, -90, 1, 0)
+        rotulo.Position = UDim2.new(0, 16, 0, 0)
+        rotulo.BackgroundTransparency = 1
+        rotulo.Text = texto
+        rotulo.TextColor3 = COR_TEXTO
+        rotulo.Font = Enum.Font.GothamMedium
+        rotulo.TextSize = 11
+        rotulo.TextXAlignment = Enum.TextXAlignment.Left
+        rotulo.ZIndex = 5
+
+        -- Elementos exclusivos do toggle deslizante
+        local trilha, botaoDeslizante, brilhoTrilha
+        -- Elementos exclusivos do botão de ação
+        local chipAcao, textoChip
+
+        if eAcao then
+            chipAcao = Instance.new("Frame", linha)
+            chipAcao.Size = UDim2.new(0, 62, 0, 24)
+            chipAcao.Position = UDim2.new(1, -74, 0.5, -12)
+            chipAcao.BackgroundColor3 = Color3.fromRGB(45, 12, 20)
+            chipAcao.BackgroundTransparency = 0.2
+            chipAcao.BorderSizePixel = 0
+            chipAcao.ZIndex = 5
+            Instance.new("UICorner", chipAcao).CornerRadius = UDim.new(0, 7)
+            local chipStroke = Instance.new("UIStroke", chipAcao)
+            chipStroke.Color = corNeon
+            chipStroke.Transparency = 0.35
+
+            textoChip = Instance.new("TextLabel", chipAcao)
+            textoChip.Size = UDim2.new(1, 0, 1, 0)
+            textoChip.BackgroundTransparency = 1
+            textoChip.Text = "EXECUTAR"
+            textoChip.TextColor3 = corNeon
+            textoChip.Font = Enum.Font.GothamBold
+            textoChip.TextSize = 9
+            textoChip.ZIndex = 6
+        else
+            trilha = Instance.new("Frame", linha)
+            trilha.Name = "Trilha"
+            trilha.Size = UDim2.new(0, 50, 0, 24)
+            trilha.Position = UDim2.new(1, -64, 0.5, -12)
+            trilha.BackgroundColor3 = Color3.fromRGB(32, 36, 46)
+            trilha.BorderSizePixel = 0
+            trilha.ZIndex = 5
+            Instance.new("UICorner", trilha).CornerRadius = UDim.new(1, 0)
+
+            local trilhaStroke = Instance.new("UIStroke", trilha)
+            trilhaStroke.Color = Color3.fromRGB(60, 68, 82)
+            trilhaStroke.Thickness = 1
+            trilhaStroke.Transparency = 0.3
+
+            -- Preenchimento que cresce da esquerda para a direita ao ativar
+            brilhoTrilha = Instance.new("Frame", trilha)
+            brilhoTrilha.Size = UDim2.new(0, 0, 1, 0)
+            brilhoTrilha.BackgroundColor3 = COR_ATIVO
+            brilhoTrilha.BackgroundTransparency = 0.55
+            brilhoTrilha.BorderSizePixel = 0
+            brilhoTrilha.ZIndex = 5
+            Instance.new("UICorner", brilhoTrilha).CornerRadius = UDim.new(1, 0)
+
+            botaoDeslizante = Instance.new("Frame", trilha)
+            botaoDeslizante.Name = "Knob"
+            botaoDeslizante.Size = UDim2.new(0, 18, 0, 18)
+            botaoDeslizante.Position = UDim2.new(0, 3, 0.5, -9)
+            botaoDeslizante.BackgroundColor3 = Color3.fromRGB(140, 150, 165)
+            botaoDeslizante.BorderSizePixel = 0
+            botaoDeslizante.ZIndex = 7
+            Instance.new("UICorner", botaoDeslizante).CornerRadius = UDim.new(1, 0)
+        end
+
+        -- Área clicável transparente cobrindo toda a linha.
+        -- É ESTE objeto que é devolvido, preservando a API original.
+        local btn = Instance.new("TextButton", linha)
+        btn.Name = "Hit_" .. texto
+        btn.Size = UDim2.new(1, 0, 1, 0)
+        btn.Position = UDim2.new(0, 0, 0, 0)
         btn.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
-        btn.Text = texto
-        btn.TextColor3 = corNeon
-        btn.Font = Enum.Font.GothamMedium
-        btn.TextSize = 8
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-        local stroke = Instance.new("UIStroke", btn)
-        stroke.Color = corNeon
-        stroke.Thickness = 1.5
+        btn.BackgroundTransparency = 1
+        btn.AutoButtonColor = false
+        btn.Text = ""
+        btn.TextTransparency = 1
+        btn.ZIndex = 8
+
+        -- Realce ao passar o mouse
+        btn.MouseEnter:Connect(function()
+            TweenService:Create(linha, TweenInfo.new(0.15), {BackgroundTransparency = 0.15}):Play()
+            TweenService:Create(linhaStroke, TweenInfo.new(0.15), {Transparency = 0.45}):Play()
+        end)
+        btn.MouseLeave:Connect(function()
+            TweenService:Create(linha, TweenInfo.new(0.2), {BackgroundTransparency = 0.35}):Play()
+            TweenService:Create(linhaStroke, TweenInfo.new(0.2), {Transparency = 0.8}):Play()
+        end)
+
+        -- Retorno tátil ao pressionar
+        btn.MouseButton1Down:Connect(function()
+            TweenService:Create(linha, TweenInfo.new(0.08), {BackgroundTransparency = 0.05}):Play()
+            if eAcao and textoChip then
+                textoChip.Text = "..."
+                task.delay(0.45, function()
+                    if textoChip and textoChip.Parent then textoChip.Text = "EXECUTAR" end
+                end)
+            end
+        end)
+
+        -- ---------------------------------------------------------------
+        -- SINCRONIZAÇÃO DE ESTADO
+        -- A lógica original escreve BackgroundColor3/TextColor3 no botão para
+        -- marcar ativo/inativo. Interceptamos e animamos o switch.
+        -- ---------------------------------------------------------------
+        local estadoAtual = false
+        local function aplicarEstado(ativo)
+            if ativo == estadoAtual then return end
+            estadoAtual = ativo
+
+            if eAcao then
+                TweenService:Create(chipAcao, TweenInfo.new(0.2), {
+                    BackgroundTransparency = ativo and 0 or 0.2
+                }):Play()
+                return
+            end
+
+            local infoMola = TweenInfo.new(0.26, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+            local infoSuave = TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+            TweenService:Create(botaoDeslizante, infoMola, {
+                Position = ativo and UDim2.new(1, -21, 0.5, -9) or UDim2.new(0, 3, 0.5, -9),
+                BackgroundColor3 = ativo and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(140, 150, 165),
+                Size = ativo and UDim2.new(0, 18, 0, 18) or UDim2.new(0, 18, 0, 18),
+            }):Play()
+
+            TweenService:Create(brilhoTrilha, infoSuave, {
+                Size = ativo and UDim2.new(1, 0, 1, 0) or UDim2.new(0, 0, 1, 0),
+                BackgroundTransparency = ativo and 0.15 or 0.55,
+            }):Play()
+
+            TweenService:Create(trilha, infoSuave, {
+                BackgroundColor3 = ativo and Color3.fromRGB(0, 90, 68) or Color3.fromRGB(32, 36, 46)
+            }):Play()
+
+            TweenService:Create(acento, infoSuave, {
+                BackgroundTransparency = ativo and 0 or 0.6,
+                Size = ativo and UDim2.new(0, 3, 1, -8) or UDim2.new(0, 3, 1, -18),
+                Position = ativo and UDim2.new(0, 0, 0, 4) or UDim2.new(0, 0, 0, 9),
+            }):Play()
+
+            TweenService:Create(linhaStroke, infoSuave, {
+                Color = ativo and COR_ATIVO or corNeon,
+                Transparency = ativo and 0.35 or 0.8,
+            }):Play()
+
+            TweenService:Create(rotulo, infoSuave, {
+                TextColor3 = ativo and COR_ATIVO or COR_TEXTO
+            }):Play()
+        end
+
+        -- Aplica o estado sempre que a lógica original alterar a cor do botão
+        btn:GetPropertyChangedSignal("BackgroundColor3"):Connect(function()
+            local c = btn.BackgroundColor3
+            aplicarEstado(math.abs(c.G - 1) < 0.02 and math.abs(c.B - 0.588) < 0.05 and c.R < 0.02)
+            btn.BackgroundTransparency = 1
+        end)
+        -- Neutraliza a cor de texto herdada (o rótulo real é o TextLabel acima)
+        btn:GetPropertyChangedSignal("TextColor3"):Connect(function()
+            btn.TextTransparency = 1
+        end)
+
+        -- Compatibilidade de posicionamento: o código original reposiciona
+        -- alguns botões para a coluna esquerda (offset X negativo). Usamos isso
+        -- como sinal de agrupamento e devolvemos o botão ao seu lugar na linha.
+        local reposicionando = false
+        btn:GetPropertyChangedSignal("Position"):Connect(function()
+            if reposicionando then return end
+            local pos = btn.Position
+            if pos.X.Offset ~= 0 or pos.Y.Offset ~= 0 or pos.X.Scale ~= 0 or pos.Y.Scale ~= 0 then
+                if pos.X.Offset < 0 then
+                    -- Grupo "Painéis Avançados"
+                    linha.LayoutOrder = 1000 + pos.Y.Offset
+                end
+                reposicionando = true
+                btn.Position = UDim2.new(0, 0, 0, 0)
+                reposicionando = false
+            end
+        end)
+
         return btn
     end
 
