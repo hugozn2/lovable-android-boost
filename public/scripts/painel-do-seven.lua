@@ -1179,34 +1179,86 @@ function InicializarPainel()
                                       string.find(p.Name:lower(), filtro, 1, true)
                 if matchesFilter then
                     local pFrame = Instance.new("Frame", scroll)
-                    pFrame.Size = UDim2.new(1, -5, 0, 42)
-                    pFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 18)
-                    Instance.new("UICorner", pFrame).CornerRadius = UDim.new(0, 6)
+                    pFrame.Size = UDim2.new(1, -6, 0, 44)
+                    pFrame.BackgroundColor3 = Color3.fromRGB(19, 22, 30)
+                    pFrame.BackgroundTransparency = 0.35
+                    pFrame.BorderSizePixel = 0
+                    pFrame.ZIndex = 5
+                    Instance.new("UICorner", pFrame).CornerRadius = UDim.new(0, 9)
                     local pfStroke = Instance.new("UIStroke", pFrame)
                     pfStroke.Color = Color3.fromRGB(0, 255, 255)
-                    pfStroke.Thickness = 0.7
+                    pfStroke.Thickness = 1
+                    pfStroke.Transparency = 0.82
+
+                    -- Marcador vertical de presença
+                    local pAcento = Instance.new("Frame", pFrame)
+                    pAcento.Size = UDim2.new(0, 3, 1, -18)
+                    pAcento.Position = UDim2.new(0, 0, 0, 9)
+                    pAcento.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+                    pAcento.BackgroundTransparency = 0.55
+                    pAcento.BorderSizePixel = 0
+                    pAcento.ZIndex = 6
+                    Instance.new("UICorner", pAcento).CornerRadius = UDim.new(1, 0)
 
                     local label = Instance.new("TextLabel", pFrame)
-                    label.Size = UDim2.new(0.65, 0, 1, 0)
-                    label.Position = UDim2.new(0, 8, 0, 0)
-                    label.Text = p.DisplayName .. "\n(@" .. p.Name .. ")"
-                    label.TextColor3 = Color3.fromRGB(0, 255, 255)
-                    label.Font = Enum.Font.Gotham; label.TextSize = 9.5; label.TextXAlignment = Enum.TextXAlignment.Left
+                    label.Size = UDim2.new(1, -96, 0, 14)
+                    label.Position = UDim2.new(0, 14, 0, 7)
+                    label.Text = p.DisplayName
+                    label.TextColor3 = Color3.fromRGB(232, 240, 245)
+                    label.Font = Enum.Font.GothamBold
+                    label.TextSize = 10
+                    label.TextTruncate = Enum.TextTruncate.AtEnd
+                    label.TextXAlignment = Enum.TextXAlignment.Left
                     label.BackgroundTransparency = 1
+                    label.ZIndex = 6
+
+                    local subLabel = Instance.new("TextLabel", pFrame)
+                    subLabel.Size = UDim2.new(1, -96, 0, 12)
+                    subLabel.Position = UDim2.new(0, 14, 0, 22)
+                    subLabel.Text = "@" .. p.Name
+                    subLabel.TextColor3 = Color3.fromRGB(112, 126, 140)
+                    subLabel.Font = Enum.Font.Gotham
+                    subLabel.TextSize = 9
+                    subLabel.TextTruncate = Enum.TextTruncate.AtEnd
+                    subLabel.TextXAlignment = Enum.TextXAlignment.Left
+                    subLabel.BackgroundTransparency = 1
+                    subLabel.ZIndex = 6
 
                     local tp = Instance.new("TextButton", pFrame)
-                    tp.Size = UDim2.new(0, 68, 0, 24)
-                    tp.Position = UDim2.new(1, -74, 0, 8)
-                    tp.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
-                    tp.Font = Enum.Font.GothamBold; tp.TextSize = 8.5; Instance.new("UICorner", tp)
+                    tp.Size = UDim2.new(0, 74, 0, 26)
+                    tp.Position = UDim2.new(1, -82, 0.5, -13)
+                    tp.BackgroundColor3 = Color3.fromRGB(11, 13, 18)
+                    tp.BackgroundTransparency = 0.1
+                    tp.AutoButtonColor = false
+                    tp.Font = Enum.Font.GothamBold
+                    tp.TextSize = 8.5
+                    tp.ZIndex = 7
+                    Instance.new("UICorner", tp).CornerRadius = UDim.new(0, 8)
                     local tpStroke = Instance.new("UIStroke", tp)
                     tpStroke.Thickness = 1
+                    tpStroke.Transparency = 0.35
+
+                    -- Realce da linha inteira ao passar o mouse sobre o botão
+                    tp.MouseEnter:Connect(function()
+                        TweenService:Create(pFrame, TweenInfo.new(0.15), {BackgroundTransparency = 0.1}):Play()
+                        TweenService:Create(pfStroke, TweenInfo.new(0.15), {Transparency = 0.45}):Play()
+                        TweenService:Create(tp, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
+                    end)
+                    tp.MouseLeave:Connect(function()
+                        TweenService:Create(pFrame, TweenInfo.new(0.2), {BackgroundTransparency = 0.35}):Play()
+                        TweenService:Create(pfStroke, TweenInfo.new(0.2), {Transparency = 0.82}):Play()
+                        TweenService:Create(tp, TweenInfo.new(0.2), {BackgroundTransparency = 0.1}):Play()
+                    end)
 
                     if ID_UltimoJogadorTeleportado == p.UserId then
                         tp.TextColor3 = Color3.fromRGB(0, 0, 0)
                         tp.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
                         tp.Text = "CONECTADO"
                         tpStroke.Color = Color3.fromRGB(46, 204, 113)
+                        pAcento.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+                        pAcento.BackgroundTransparency = 0
+                        pfStroke.Color = Color3.fromRGB(46, 204, 113)
+                        pfStroke.Transparency = 0.45
                     else
                         tp.TextColor3 = Color3.fromRGB(255, 0, 255)
                         tp.Text = "TELEPORT"
