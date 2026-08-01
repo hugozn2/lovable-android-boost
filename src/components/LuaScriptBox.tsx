@@ -1,14 +1,30 @@
-import { useState } from "react";
-import { Copy, Check, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Copy, Check, Trash2, RotateCcw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-const DEFAULT_SCRIPT = `-- Cole seu script Lua aqui
-print("Hello, world!")
-`;
+const SCRIPT_URL = "/scripts/painel-do-seven.lua";
 
 const LuaScriptBox = () => {
-  const [script, setScript] = useState<string>(DEFAULT_SCRIPT);
+  const [script, setScript] = useState<string>("");
+  const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+
+  const loadScript = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(SCRIPT_URL);
+      if (!res.ok) throw new Error("fetch failed");
+      setScript(await res.text());
+    } catch {
+      toast({ title: "Erro", description: "Não foi possível carregar o script.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadScript();
+  }, []);
 
   const handleCopy = async () => {
     try {
@@ -29,9 +45,9 @@ const LuaScriptBox = () => {
   return (
     <div className="card-frost frost-glow flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <span className="stat-label">script.lua</span>
+        <span className="stat-label">Painel_do_seven_1.0.8.lua</span>
         <span className="text-[10px] font-mono text-muted-foreground">
-          {lineCount} linhas · {charCount} chars
+          {loading ? "carregando..." : `${lineCount} linhas · ${charCount} chars`}
         </span>
       </div>
 
@@ -46,10 +62,18 @@ const LuaScriptBox = () => {
       <div className="flex gap-3">
         <button
           onClick={handleCopy}
+          disabled={loading}
           className="btn-primary-full flex items-center justify-center gap-2"
         >
           {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
           {copied ? "Copiado!" : "Copiar tudo"}
+        </button>
+        <button
+          onClick={loadScript}
+          className="px-5 rounded-[14px] border border-border bg-secondary text-secondary-foreground hover:bg-muted transition-colors flex items-center gap-2 font-semibold"
+          aria-label="Restaurar script original"
+        >
+          <RotateCcw className="w-5 h-5" />
         </button>
         <button
           onClick={handleClear}
